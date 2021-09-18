@@ -25,6 +25,7 @@ namespace Basket.API.Repositories
 
         public async Task<ShoppingCart> UpdateBasket(ShoppingCart basket)
         {
+            //aynı key ile redis'e birden fazla ekleme işlemi yapar. İşlemi redis tool'da dene.
             await _redisCache.SetStringAsync(basket.UserName, JsonConvert.SerializeObject(basket));
             return await GetBasket(basket.UserName);
         }

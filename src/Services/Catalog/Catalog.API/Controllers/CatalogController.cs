@@ -23,7 +23,7 @@ namespace Catalog.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
         {
             IEnumerable<Product> products = await _productRepository.GetProducts();
@@ -33,7 +33,7 @@ namespace Catalog.API.Controllers
 
         [HttpGet("{Id:length(24)}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Product>> GetProductById(string Id)
         {
             Product prd = await _productRepository.GetProduct(Id);
@@ -44,7 +44,7 @@ namespace Catalog.API.Controllers
         //GetProductsByCategoryName
         [HttpGet("/[action]/{catName}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(string catName)
         {
             IEnumerable<Product> productsOfSpecifiedCategory = await _productRepository.GetProductByCategory(catName);
