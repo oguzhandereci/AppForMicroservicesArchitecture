@@ -1,4 +1,5 @@
 ﻿using Basket.API.Entities;
+using Basket.API.GrpcServices;
 using Basket.API.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace Basket.API.Controllers
     public class BasketController : ControllerBase
     {
         private readonly IBasketRepository _basketRepository;
+        private readonly DiscountGrpcService _discountGrpcService;
 
-        public BasketController(IBasketRepository basketRepository)
+        public BasketController(IBasketRepository basketRepository, DiscountGrpcService discountGrpcService)
         {
-            _basketRepository = basketRepository;
+            _basketRepository = basketRepository ?? throw new ArgumentNullException(nameof(basketRepository));
+            _discountGrpcService = discountGrpcService ?? throw new ArgumentNullException(nameof(discountGrpcService));
         }
 
         //GetBasket(with all items)
@@ -35,7 +38,17 @@ namespace Basket.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]//gönderilen basket nesnesi için validasyon kuralı işletilip, validasyondan geçmediği durumlarda bu status code döndürülebilir.
         public async Task<ActionResult<ShoppingCart>> UpdateBasket([FromBody] ShoppingCart basket)
         {
-            return await _basketRepository.UpdateBasket(basket);
+            foreach (var item in basket.Items)
+            {
+                var coupon = await _discountGrpcService.GetDiscount(item.ProductId);
+
+                if (coupon is not null)
+                {
+                    item.Price -= coupon.CouponAmount;
+                }
+            }
+
+            return Ok(await _basketRepository.UpdateBasket(basket));
         }
         //DeleteBasketCompletely
         [HttpDelete]
